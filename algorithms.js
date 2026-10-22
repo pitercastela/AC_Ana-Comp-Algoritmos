@@ -23,20 +23,27 @@
   }
 
   function dfs(graph, start) {
-    const list = adjacency(graph), visited = new Set(), order = [], tree = [], parent = new Map([[start, null]]), steps = [];
+    const list = adjacency(graph), visited = new Set(), finished = new Set(), order = [], tree = [];
+    const parent = new Map([[start, null]]), depth = new Map([[start, 0]]), pre = new Map(), post = new Map(), steps = [];
+    let clock = 0;
     function visit(vertex) {
       visited.add(vertex);
       order.push(vertex);
-      steps.push({ title: `Visitar ${vertex}`, description: `${vertex} entra na busca em profundidade.`, active: vertex, visited: [...visited], edges: [...tree] });
+      pre.set(vertex, ++clock);
+      steps.push({ title: `Pré-visita de ${vertex}`, description: `${vertex} é acessado pela primeira vez (tempo ${clock}).`, phase: 'pre', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree] });
       for (const neighbor of list.get(vertex)) {
         if (visited.has(neighbor.vertex)) continue;
         parent.set(neighbor.vertex, vertex);
+        depth.set(neighbor.vertex, depth.get(vertex) + 1);
         tree.push({ from: vertex, to: neighbor.vertex });
         visit(neighbor.vertex);
       }
+      post.set(vertex, ++clock);
+      finished.add(vertex);
+      steps.push({ title: `Pós-visita de ${vertex}`, description: `Todos os vizinhos de ${vertex} foram examinados; a busca retorna ao vértice anterior (tempo ${clock}).`, phase: 'post', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree] });
     }
     visit(start);
-    return { start, order, tree, unreachable: graph.vertices.filter(vertex => !visited.has(vertex)).sort(compareNames), steps };
+    return { start, order, tree, rows: order.map(vertex=>({vertex,parent:parent.get(vertex),depth:depth.get(vertex),pre:pre.get(vertex),post:post.get(vertex)})), unreachable: graph.vertices.filter(vertex => !visited.has(vertex)).sort(compareNames), steps };
   }
 
   function bfs(graph, start) {
@@ -64,8 +71,16 @@
 
   function dijkstra(graph, start) {
     const list = adjacency(graph), distance = new Map(graph.vertices.map(vertex => [vertex, Infinity]));
-    const parent = new Map([[start, null]]), settled = new Set(), steps = [];
+    const parent = new Map([[start, null]]), settled = new Set(), steps = [], iterations = [];
     distance.set(start, 0);
+    const columns = [...graph.vertices].sort(compareNames);
+    function snapshot(number, current) {
+      iterations.push({ number, current, cells: columns.map(vertex => ({
+        vertex, distance: distance.get(vertex), settled: settled.has(vertex),
+        path: Number.isFinite(distance.get(vertex)) ? pathTo(parent, vertex) : []
+      })) });
+    }
+    snapshot(0, null);
     while (settled.size < graph.vertices.length) {
       let best = null;
       for (const vertex of graph.vertices) {
@@ -85,8 +100,9 @@
           steps.push({ title: `Atualizar ${neighbor.vertex}`, description: `Nova distância: ${candidate}, passando por ${best}.`, active: neighbor.vertex, visited: [...settled], edges: [...parent].filter(([,from])=>from!==null).map(([to,from])=>({from,to})) });
         }
       }
+      snapshot(iterations.length, best);
     }
-    return { start, steps, rows: graph.vertices.map(vertex => ({
+    return { start, steps, iterations, rows: graph.vertices.map(vertex => ({
       vertex, distance: distance.get(vertex),
       path: distance.get(vertex) < Infinity ? pathTo(parent, vertex) : []
     })) };

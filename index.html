@@ -49,7 +49,8 @@
               <button class="algorithm-button" data-algorithm="Dijkstra"><span class="algorithm-icon">⌁</span><strong>Dijkstra</strong><small>Menor caminho com pesos</small></button>
               <button class="algorithm-button" data-algorithm="Kruskal"><span class="algorithm-icon">◇</span><strong>Kruskal</strong><small>Árvore geradora mínima</small></button>
             </div>
-            <div id="resultPanel" class="result-panel"><span class="result-mark">▦</span><div><strong>Nenhuma análise executada</strong><p>Escolha uma origem e execute um algoritmo para ver o resultado.</p></div></div>
+            <p id="analysisError" class="error" role="alert"></p>
+            <a id="resultsJump" class="button button-secondary results-jump" href="#resultsSection" hidden>Ver resultado ↓</a>
           </section>
         </aside>
 
@@ -63,6 +64,11 @@
           </section>
 
       </div>
+      <section id="resultsSection" class="card results-section" aria-label="Resultados dos algoritmos">
+        <div class="section-heading"><div><span class="step">04</span><h2>Resultados</h2></div></div>
+        <p class="section-help">Os dados da análise aparecem aqui; o mapa acima mostra a execução visual.</p>
+        <div id="resultPanel" class="result-panel"><span class="result-mark">▦</span><div><strong>Nenhuma análise executada</strong><p>Escolha um algoritmo na barra lateral para ver o resultado.</p></div></div>
+      </section>
     </main>
   </div>
 

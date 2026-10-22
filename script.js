@@ -52,7 +52,8 @@ function pauseAnimation(){if(animation.timer){clearInterval(animation.timer);ani
 function showFrame(){
   const step=animation.steps[animation.index];if(!step)return;
   drawGraph($('#executionSvg'),step);
-  $('#executionDirection').textContent=state.directed?'→ Grafo direcionado: cada seta indica o sentido permitido.':'— Grafo não direcionado: cada ligação pode ser percorrida nos dois sentidos.';
+  const directionHint=state.directed?'→ Grafo direcionado: cada seta indica o sentido permitido.':'— Grafo não direcionado: cada ligação pode ser percorrida nos dois sentidos.';
+  $('#executionDirection').textContent=animation.name==='DFS'?`${directionHint} Laranja: pré-visita; roxo: pós-visita.`:directionHint;
   $('#executionStepLabel').textContent=`${animation.name.toUpperCase()} · PASSO ${animation.index+1}`;
   $('#executionTitle').textContent=step.title;
   $('#executionDescription').textContent=step.description;
@@ -88,7 +89,7 @@ $('#playPauseAnimation').addEventListener('click',()=>{if(animation.timer)pauseA
 function clearErrors(){ $('#vertexError').textContent=''; $('#edgeError').textContent=''; }
 function compareNames(a,b){return a.localeCompare(b,'pt-BR',{sensitivity:'base'})||a.localeCompare(b,'pt-BR');}
 function setGraph(graph){ state.replace(graph); clearErrors(); render(); }
-function invalidateResult(){ clearAnimation();$('#resultPanel').className='result-panel'; $('#resultPanel').innerHTML='<span class="result-mark">▦</span><div><strong>Grafo atualizado</strong><p>Escolha uma análise para o grafo atual.</p></div>'; }
+function invalidateResult(){ clearAnimation();$('#resultsJump').hidden=true;$('#analysisError').textContent='';$('#resultPanel').className='result-panel'; $('#resultPanel').innerHTML='<span class="result-mark">▦</span><div><strong>Grafo atualizado</strong><p>Escolha uma análise para o grafo atual.</p></div>'; }
 function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function options(selected=''){return '<option value="">Selecione</option>'+state.vertices.map(v=>`<option value="${escapeHtml(v)}" ${v===selected?'selected':''}>${escapeHtml(v)}</option>`).join('');}
 function render(){
@@ -133,7 +134,7 @@ function drawGraph(svg,frame=null){
     const colors={rejected:'#d66b55',selected:'#15a98d',muted:'#c8d9da',normal:'#8aafb2'};
     return `<g><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${colors[style]}" stroke-width="${selected||candidate?4:2}" ${state.directed?`marker-end="url(#${markerId(style)})"`:''}/>${state.weighted?`<rect x="${mx-13}" y="${my-13}" width="26" height="20" rx="5" fill="#fff" stroke="#dce9e8"/><text x="${mx}" y="${my+1}" text-anchor="middle" font-size="11" font-weight="700" fill="#47717c">${e.weight}</text>`:''}</g>`;
   }).join('');
-  const nodes=state.vertices.map(v=>{const p=positions.get(v);const fill=frame?(v===frame.active?'#e7a33e':frame.visited?.includes(v)?'#137e72':'#9bb6b9'):'#137e72';return `<g><circle cx="${p.x}" cy="${p.y}" r="22" fill="${fill}" stroke="#fff" stroke-width="4"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${escapeHtml(v.length>5?v.slice(0,5)+'…':v)}</text></g>`}).join('');
+  const nodes=state.vertices.map(v=>{const p=positions.get(v);const fill=frame?(v===frame.active?(frame.phase==='post'?'#8063b2':'#e7a33e'):frame.finished?.includes(v)?'#8063b2':frame.visited?.includes(v)?'#137e72':'#9bb6b9'):'#137e72';return `<g><circle cx="${p.x}" cy="${p.y}" r="22" fill="${fill}" stroke="#fff" stroke-width="4"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${escapeHtml(v.length>5?v.slice(0,5)+'…':v)}</text></g>`}).join('');
   svg.innerHTML=defs+edges+nodes;
 }
 
@@ -145,24 +146,32 @@ $('#exampleButton').addEventListener('click',()=>{if(state.vertices.length&&!con
 for(const id of ['#direction','#weightMode'])$(id).addEventListener('change',()=>{state.configure({directed:$('#direction').value==='directed',weighted:$('#weightMode').value==='weighted'});render();invalidateResult();});
 document.querySelectorAll('[data-algorithm]').forEach(button=>button.addEventListener('click',()=>{
   const name=button.dataset.algorithm, start=$('#startVertex').value;
+  $('#analysisError').textContent='';
   if(!state.vertices.length){showNotice('Adicione um grafo primeiro','Cadastre vértices e arestas antes de executar análises.');return;}
   if(name!=='Kruskal'&&!start){showNotice('Escolha uma origem',`Selecione um vértice de origem para ${name}.`);return;}
   if(name==='Kruskal'&&state.directed){showNotice('Kruskal indisponível','O algoritmo exige um grafo não direcionado.');return;}
   const algorithm=SmartNetAlgorithms[name.toLowerCase()];
   const result=name==='Kruskal'?algorithm(state):algorithm(state,start);
   renderAnalysis(name,result);
+  $('#resultsJump').hidden=false;
   startAnimation(name,result.steps);
 }));
-function showNotice(title,body){$('#resultPanel').className='result-panel notice';$('#resultPanel').innerHTML=`<span class="result-mark">▦</span><div><strong>${escapeHtml(title)}</strong><p>${escapeHtml(body)}</p></div>`;}
+function showNotice(title,body){$('#analysisError').textContent=`${title}: ${body}`;}
 function resultTable(headings,rows){
   return `<div class="result-table-wrap"><table class="result-table"><thead><tr>${headings.map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(cell=>`<td>${escapeHtml(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function dijkstraIterationTable(iterations){
+  const columns=iterations[0].cells.map(cell=>cell.vertex);
+  return `<div class="result-block"><h4>Evolução das rotas</h4><p>Cada célula mostra a melhor distância e o caminho conhecidos após a iteração. ✓ indica distância definitiva.</p></div><div class="result-table-wrap iteration-table-wrap"><table class="result-table iteration-table"><thead><tr><th scope="col">Iteração</th>${columns.map(vertex=>`<th scope="col">${escapeHtml(vertex)}</th>`).join('')}</tr></thead><tbody>${iterations.map(row=>`<tr><th scope="row">${row.number}${row.current?` · ${escapeHtml(row.current)}`:' · início'}</th>${row.cells.map(cell=>`<td class="${cell.settled?'definitive':''} ${row.current===cell.vertex?'current':''}"><div class="iteration-cell"><strong>${Number.isFinite(cell.distance)?cell.distance:'∞'}${cell.settled?' ✓':''}</strong><small>${cell.path.length?escapeHtml(cell.path.join(' → ')):'—'}</small></div></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
 }
 function renderAnalysis(name,result){
   let description='',content='';
   if(name==='DFS'){
     description=`Origem: ${escapeHtml(result.start)} · ${result.order.length} vértices visitados`;
     content=`<div class="result-block"><h4>Ordem de visita</h4><p class="route-line">${result.order.map(escapeHtml).join(' → ')}</p></div>`;
-    content+=`<div class="result-block"><h4>Árvore de busca</h4>${result.tree.length?resultTable(['Aresta','Descoberta'],result.tree.map((edge,index)=>[`${edge.from} → ${edge.to}`,index+1])):'<p>Nenhuma aresta foi percorrida.</p>'}</div>`;
+    content+=`<div class="result-block"><h4>Árvore de busca</h4><div class="dfs-tree">${result.rows.map((row,index)=>`<div class="dfs-tree-row" style="padding-left:${Math.min(row.depth*18,360)}px"><span class="dfs-tree-order">${index+1}.</span><strong>${escapeHtml(row.vertex)}</strong><span>${row.parent===null?'origem':`← ${escapeHtml(row.parent)}`}</span></div>`).join('')}</div></div>`;
+    content+=`<div class="result-block"><h4>Tempos de visita</h4><p>Pré: primeiro acesso. Pós: retorno após examinar os vizinhos.</p></div>`;
+    content+=resultTable(['Vértice','A partir de','Pré','Pós'],result.rows.map(row=>[row.vertex,row.parent??'Origem',row.pre,row.post]));
     if(result.unreachable.length)content+=`<p class="result-warning">Não alcançados: ${result.unreachable.map(escapeHtml).join(', ')}</p>`;
   }else if(name==='BFS'){
     description=`Origem: ${escapeHtml(result.start)} · menor número de arestas`;
@@ -171,7 +180,9 @@ function renderAnalysis(name,result){
     if(state.weighted)content+='<p class="result-note">BFS conta arestas; não considera seus pesos.</p>';
   }else if(name==='Dijkstra'){
     description=`Origem: ${escapeHtml(result.start)} · menor custo acumulado`;
-    content=resultTable(['Vértice','Distância','Caminho'],result.rows.map(row=>[row.vertex,Number.isFinite(row.distance)?row.distance:'∞',row.path.length?row.path.join(' → '):'Inalcançável']));
+    content=dijkstraIterationTable(result.iterations);
+    content+='<div class="result-block"><h4>Resultado final</h4></div>';
+    content+=resultTable(['Vértice','Distância','Caminho'],result.rows.map(row=>[row.vertex,Number.isFinite(row.distance)?row.distance:'∞',row.path.length?row.path.join(' → '):'Inalcançável']));
     if(!state.weighted)content+='<p class="result-note">Neste grafo sem peso, cada aresta vale 1.</p>';
   }else{
     description=`${result.components.length===1?'Árvore geradora mínima':'Floresta geradora mínima'} · ${result.edges.length} arestas`;

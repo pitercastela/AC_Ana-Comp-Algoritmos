@@ -36,7 +36,7 @@ Não é necessário instalar dependências ou iniciar um servidor para usar a ap
 2. **Monte a rede.** Em **Editar grafo**, adicione cada vértice pelo nome. Depois escolha origem, destino e, se o grafo tiver pesos, o peso de cada aresta. O mapa e a lista de adjacência são atualizados imediatamente.
 3. **Confira a estrutura.** A área principal mostra o desenho SVG e, abaixo, a lista de adjacência usada internamente pela aplicação. Em grafos direcionados, as setas indicam o sentido permitido.
 4. **Execute uma análise.** Abra **Análises**, escolha o vértice de origem para DFS, BFS ou Dijkstra e clique no algoritmo desejado. Kruskal não precisa de origem e está disponível apenas para grafos não direcionados.
-5. **Leia o resultado.** A barra lateral mostra os dados em texto ou tabela. O mapa muda para a aba **Execução**, onde é possível pausar, avançar, voltar ou reiniciar a animação. A aba **Grafo** mostra o mapa sem destaques.
+5. **Leia o resultado.** A seção **Resultados**, abaixo do mapa e dos controles, mostra os dados em texto ou tabela. Use **Ver resultado** na barra lateral para chegar até ela. O mapa muda para a aba **Execução**, onde é possível pausar, avançar, voltar ou reiniciar a animação. A aba **Grafo** mostra o mapa sem destaques.
 6. **Troque de grafo.** Use **Limpar grafo**, carregue um dos grafos de teste ou importe outro. Ao alterar o grafo, o resultado e a animação anteriores são descartados.
 7. **Encerre.** Clique em **Finalizar aplicação** no cabeçalho. A tela de encerramento oferece **Iniciar nova sessão**.
 
@@ -91,9 +91,9 @@ Norte,Sul
 
 | Algoritmo | Resultado                                                                                                               |
 | --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| DFS       | Ordem de visita, arestas da árvore de busca e vértices não alcançados.                                                  |
+| DFS       | Ordem de visita, árvore com a ordem e origem de cada descoberta, tempos de pré e pós-visita e vértices não alcançados. |
 | BFS       | Ordem de visita, nível de cada vértice e caminho com o menor número de arestas. A BFS não considera pesos.              |
-| Dijkstra  | Menor distância acumulada e caminho da origem até cada vértice. Vértices inalcançáveis aparecem com distância infinita. |
+| Dijkstra  | Tabela por iteração com a melhor distância e rota conhecidas para cada vértice; tabela final de distâncias e caminhos. Vértices inalcançáveis aparecem com distância infinita. |
 | Kruskal   | Arestas selecionadas e custo total. Se o grafo estiver desconectado, mostra uma floresta geradora e seus componentes.   |
 
 Quando houver empate, a aplicação usa **ordem alfabética** para escolher vizinhos, vértices ou arestas de mesmo custo. O Dijkstra aceita apenas pesos não negativos.
