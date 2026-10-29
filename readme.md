@@ -12,16 +12,16 @@ Aplicação Web para cadastrar uma cidade como grafo, visualizar sua lista de ad
 | Integrante                       | Matrícula             |
 | -------------------------------- | --------------------- |
 | Lucas Alves Castela Pereira      | 202402705989          |
-| Rodrigo de Sousa Ferrett         | Matrícula — preencher |
-| Pedro dos Santos Carlos da Silva | Matrícula — preencher |
-| Sarah Ferrari Rodrigues          | Matrícula — preencher |
-| João Pedro Borges Souza Santana  | Matrícula — preencher |
+| Rodrigo de Sousa Ferrett         | 202402103253          |
+| Pedro dos Santos Carlos da Silva | 202401000493          |
+| Sarah Ferrari Rodrigues          | 202307576331          |
+| João Pedro Borges Souza Santana  | 202402717707          |
 
 ## Acessar a aplicação
 
 ### Pelo site publicado
 
-O endereço do GitHub Pages será incluído aqui após a publicação. A aplicação funciona inteiramente no navegador; não exige conta nem instalação.
+https://pitercastela.github.io/AC_Ana-Comp-Algoritmos/
 
 ### Localmente
 
