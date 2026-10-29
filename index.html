@@ -10,64 +10,91 @@
   <div id="app">
     <header class="topbar">
       <div class="brand"><span class="brand-mark">◎</span><div><strong>SmartNet</strong><small>ANALYZER</small></div></div>
-      <span class="prototype-pill">Protótipo de interface</span>
       <button id="finishButton" class="button button-ghost">Finalizar aplicação</button>
     </header>
 
     <main class="workspace">
+      <nav class="workspace-tabs" role="tablist" aria-label="Áreas do SmartNet">
+        <button id="workspaceBuildTab" class="workspace-tab active" type="button" role="tab" aria-controls="buildWorkspace" aria-selected="true" tabindex="0">Montar grafos</button>
+        <button id="workspaceAnalysisTab" class="workspace-tab" type="button" role="tab" aria-controls="analysisWorkspace" aria-selected="false" tabindex="-1">Algoritmos</button>
+      </nav>
+      <section id="buildWorkspace" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceBuildTab">
       <section class="intro">
         <div><p class="eyebrow">MAPEAMENTO E ANÁLISE DE GRAFOS</p><h1>Construa sua cidade. Explore as conexões.</h1><p>Cadastre bairros e vias, confira a lista de adjacência e prepare suas análises em um só lugar.</p></div>
-        <div class="intro-actions"><label class="sr-only" for="presetSelect">Grafo de teste</label><select id="presetSelect" aria-label="Grafo de teste"><option value="proposal">Grafo da proposta</option><option value="ties">Empates de rota</option><option value="directed">Cidade direcionada</option><option value="disconnected">Bairros isolados</option></select><button id="exampleButton" class="button button-secondary">Carregar teste</button><button id="importButton" class="button button-primary">Importar grafo</button></div>
+        <div class="intro-actions builder-source"><label class="field-label" for="builderGraphSelect">Grafo de base para edição</label><div class="builder-source-controls"><select id="builderGraphSelect" aria-label="Grafo de base para edição"></select><button id="loadBuilderGraph" class="button button-secondary" type="button">Carregar</button><button id="importButton" class="button button-primary" type="button">Importar grafo</button><button id="exportButton" class="button button-secondary" type="button" disabled>Exportar TXT</button></div><p id="exportMessage" class="export-message" role="status"></p></div>
       </section>
 
       <div class="layout">
-        <aside class="module-sidebar" aria-label="Módulos do grafo">
-          <nav class="module-nav" aria-label="Alternar módulo">
-            <button class="module-tab" type="button" data-module="config" aria-controls="module-config" aria-selected="false"><span>01</span> Configuração</button>
-            <button class="module-tab active" type="button" data-module="editor" aria-controls="module-editor" aria-selected="true"><span>02</span> Editar grafo</button>
-            <button class="module-tab" type="button" data-module="analysis" aria-controls="module-analysis" aria-selected="false"><span>03</span> Análises</button>
-          </nav>
-          <section id="module-config" class="card config-card module-panel" hidden>
+        <aside class="module-sidebar builder-sidebar" aria-label="Ferramentas de montagem">
+          <section class="card config-card">
             <div class="section-heading"><div><span class="step">01</span><h2>Configuração</h2></div></div>
             <div class="config-content"><p class="section-help">Defina o tipo antes de adicionar elementos.</p><div><label class="field-label" for="direction">Conexões</label><select id="direction"><option value="undirected">Não direcionadas</option><option value="directed">Direcionadas</option></select></div><div><label class="field-label" for="weightMode">Pesos</label><select id="weightMode"><option value="weighted">Com peso</option><option value="unweighted">Sem peso</option></select></div></div>
           </section>
 
-          <section id="module-editor" class="card editor-card module-panel">
+          <section class="card editor-card">
             <div class="section-heading"><div><span class="step">02</span><h2>Editar grafo</h2></div></div>
             <div class="subsection"><h3>Novo vértice</h3><form id="vertexForm" class="inline-form"><input id="vertexName" aria-label="Nome do vértice" placeholder="Ex.: Centro" maxlength="24" required><button class="button button-primary" type="submit">Adicionar</button></form><p id="vertexError" class="error" role="alert"></p></div>
-            <div class="subsection"><h3>Nova aresta</h3><form id="edgeForm"><div class="field-grid"><div><label class="field-label" for="edgeFrom">Origem</label><select id="edgeFrom" required></select></div><div><label class="field-label" for="edgeTo">Destino</label><select id="edgeTo" required></select></div></div><div id="weightField"><label class="field-label" for="edgeWeight">Peso</label><input id="edgeWeight" type="number" min="0" step="any" value="1" required></div><button class="button button-primary button-full" type="submit">Adicionar conexão</button></form><p id="edgeError" class="error" role="alert"></p></div>
+            <div class="subsection"><h3>Nova aresta</h3><p class="section-help">Clique em dois vértices no mapa. Em grafos direcionados, selecione primeiro a origem e depois o destino.</p><div id="weightField"><label class="field-label" for="edgeWeight">Peso da próxima aresta</label><input id="edgeWeight" type="number" min="0" step="any" value="1" required></div><div class="edge-selection"><p id="edgeSelectionStatus" role="status" aria-live="polite">Adicione pelo menos dois vértices para criar uma conexão.</p><button id="cancelEdgeSelection" class="text-button" type="button" hidden>Cancelar seleção</button></div><p id="edgeError" class="error" role="alert"></p></div>
             <div class="elements-heading"><h3>Elementos cadastrados</h3><button id="clearButton" class="text-button">Limpar grafo</button></div>
             <div id="elementsList" class="elements-list"></div>
           </section>
-          <section id="module-analysis" class="card analysis-card module-panel" hidden>
-            <div class="section-heading"><div><span class="step">03</span><h2>Análises</h2></div></div>
-            <p class="section-help">Escolha um algoritmo para inspecionar a rede.</p>
-            <div class="analysis-toolbar"><div><label class="field-label" for="startVertex">Vértice de origem</label><select id="startVertex"></select></div><span id="algorithmHint">Necessário para DFS, BFS e Dijkstra</span></div>
-            <div class="algorithm-grid">
-              <button class="algorithm-button" data-algorithm="DFS"><span class="algorithm-icon">↘</span><strong>DFS</strong><small>Busca em profundidade</small></button>
-              <button class="algorithm-button" data-algorithm="BFS"><span class="algorithm-icon">≋</span><strong>BFS</strong><small>Busca em largura</small></button>
-              <button class="algorithm-button" data-algorithm="Dijkstra"><span class="algorithm-icon">⌁</span><strong>Dijkstra</strong><small>Menor caminho com pesos</small></button>
-              <button class="algorithm-button" data-algorithm="Kruskal"><span class="algorithm-icon">◇</span><strong>Kruskal</strong><small>Árvore geradora mínima</small></button>
-            </div>
-            <p id="analysisError" class="error" role="alert"></p>
-            <a id="resultsJump" class="button button-secondary results-jump" href="#resultsSection" hidden>Ver resultado ↓</a>
+          <section class="card save-card">
+            <div class="section-heading"><div><span class="step">03</span><h2>Salvar para análise</h2></div></div>
+            <p class="section-help">Dê um nome ao grafo para encontrá-lo na aba Algoritmos.</p>
+            <label class="field-label" for="graphName">Nome deste grafo</label>
+            <form id="saveGraphForm" class="inline-form"><input id="graphName" aria-label="Nome do grafo" placeholder="Ex.: Minha cidade" maxlength="40" required><button class="button button-primary" type="submit">Salvar</button></form>
+            <p class="save-warning">Salvar com o nome de um grafo já salvo substituirá a versão anterior.</p>
+            <p id="overwriteWarning" class="save-warning active" role="status" hidden>Já existe um grafo com este nome. Ao salvar, ele será substituído.</p>
+            <p id="saveGraphMessage" class="save-message" role="status"></p>
+            <p id="draftStatus" class="draft-status" role="status"></p>
           </section>
         </aside>
 
-          <section class="card graph-card">
+          <section class="card graph-card builder-map">
             <div class="section-heading"><div><span class="step">◎</span><h2>Mapa da rede</h2></div><span id="graphSummary" class="summary-pill">0 vértices · 0 arestas</span></div>
-            <div class="map-tabs" role="tablist" aria-label="Visualização do mapa"><button id="graphTab" class="map-tab active" type="button" role="tab" aria-selected="true" aria-controls="graphView">Grafo</button><button id="executionTab" class="map-tab" type="button" role="tab" aria-selected="false" aria-controls="executionView" disabled>Execução <span id="executionTabBadge" hidden>●</span></button></div>
-            <div id="graphView" role="tabpanel" aria-labelledby="graphTab"><div class="graph-surface"><svg id="graphSvg" viewBox="0 0 760 310" role="img" aria-label="Representação visual do grafo"></svg><div id="graphEmpty" class="graph-empty"><div class="empty-icon">◇</div><strong>Sua cidade começa aqui</strong><span>Adicione um vértice ou carregue o exemplo para visualizar a rede.</span></div></div></div>
-            <div id="executionView" role="tabpanel" aria-labelledby="executionTab" hidden><div class="graph-surface execution-surface"><svg id="executionSvg" viewBox="0 0 760 310" role="img" aria-label="Animação da execução do algoritmo"></svg></div><div id="executionDirection" class="execution-direction"></div><div class="execution-caption"><div><span id="executionStepLabel" class="result-kicker">PASSO 0</span><strong id="executionTitle">Execução</strong><p id="executionDescription"></p></div><span id="executionCounter" class="summary-pill">0 / 0</span></div><div class="execution-controls"><button id="restartAnimation" class="button button-secondary" type="button">↺ Reiniciar</button><button id="previousStep" class="button button-secondary" type="button">← Anterior</button><button id="playPauseAnimation" class="button button-primary" type="button">Pausar</button><button id="nextStep" class="button button-secondary" type="button">Próximo →</button></div></div>
+            <div id="builderGraphSurface" class="graph-surface"><svg id="graphSvg" viewBox="0 0 760 310" role="group" aria-label="Mapa interativo do grafo em montagem. Selecione dois vértices para criar uma aresta ou clique no peso para editá-lo."></svg><div id="graphEmpty" class="graph-empty"><div class="empty-icon">◇</div><strong>Sua cidade começa aqui</strong><span>Adicione um vértice ou carregue um teste para visualizar a rede.</span></div><form id="weightEditor" class="weight-editor" hidden><label id="weightEditorLabel" for="editedWeight">Editar peso</label><input id="editedWeight" type="number" min="0" step="any" required><div class="weight-editor-actions"><button class="button button-primary" type="submit">Salvar</button><button id="cancelWeightEdit" class="button button-secondary" type="button">Cancelar</button></div><p id="weightEditError" class="error" role="alert"></p></form></div>
             <div class="adjacency-header"><div><h3>Lista de adjacência</h3><p>Representação em memória do grafo atual</p></div><span class="required-tag">REQUISITO DA AC</span></div>
             <div id="adjacencyList" class="adjacency-list"></div>
           </section>
 
       </div>
+      </section>
+      <section id="analysisWorkspace" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceAnalysisTab" hidden>
+        <section class="intro analysis-intro"><div><p class="eyebrow">ALGORITMOS EM GRAFOS</p><h1>Selecione um grafo e execute uma análise.</h1><p>Os grafos salvos na montagem e os exemplos de teste estão disponíveis abaixo.</p></div></section>
+        <div class="layout">
+          <aside class="module-sidebar" aria-label="Ferramentas de análise">
+            <section class="card analysis-card">
+              <div class="section-heading"><div><span class="step">01</span><h2>Grafo da análise</h2></div></div>
+              <label class="field-label" for="analysisGraphSelect">Selecionar grafo</label>
+              <div class="inline-form"><select id="analysisGraphSelect"></select><button id="reloadAnalysisGraph" class="button button-secondary" type="button">Carregar</button></div>
+              <p id="analysisGraphInfo" class="section-help">Escolha um grafo para começar.</p>
+              <div class="analysis-divider"></div>
+              <div class="section-heading"><div><span class="step">02</span><h2>Executar algoritmo</h2></div></div>
+              <div class="analysis-toolbar"><div><label class="field-label" for="startVertex">Vértice de origem</label><select id="startVertex"></select></div><span id="algorithmHint">Necessário para DFS, BFS e Dijkstra</span></div>
+              <div class="algorithm-grid">
+                <button class="algorithm-button" data-algorithm="DFS"><span class="algorithm-icon">↘</span><strong>DFS</strong><small>Busca em profundidade</small></button>
+                <button class="algorithm-button" data-algorithm="BFS"><span class="algorithm-icon">≋</span><strong>BFS</strong><small>Busca em largura</small></button>
+                <button class="algorithm-button" data-algorithm="Dijkstra"><span class="algorithm-icon">⌁</span><strong>Dijkstra</strong><small>Menor caminho com pesos</small></button>
+                <button class="algorithm-button" data-algorithm="Kruskal"><span class="algorithm-icon">◇</span><strong>Kruskal</strong><small>Árvore geradora mínima</small></button>
+              </div>
+              <p id="analysisError" class="error" role="alert"></p>
+              <a id="resultsJump" class="button button-secondary results-jump" href="#resultsSection" hidden>Ver resultado ↓</a>
+            </section>
+          </aside>
+          <section class="card graph-card analysis-map">
+            <div class="section-heading"><div><span class="step">◎</span><h2>Grafo selecionado</h2></div><span id="analysisGraphSummary" class="summary-pill">Nenhum grafo</span></div>
+            <div class="map-tabs" role="tablist" aria-label="Visualização do grafo em análise"><button id="graphTab" class="map-tab active" type="button" role="tab" aria-selected="true" aria-controls="graphView">Grafo</button><button id="executionTab" class="map-tab" type="button" role="tab" aria-selected="false" aria-controls="executionView" disabled>Execução <span id="executionTabBadge" hidden>●</span></button></div>
+            <div id="graphView" role="tabpanel" aria-labelledby="graphTab"><div class="graph-surface"><svg id="analysisGraphSvg" viewBox="0 0 760 310" role="img" aria-label="Representação visual do grafo selecionado"></svg><div id="analysisGraphEmpty" class="graph-empty"><div class="empty-icon">◇</div><strong>Selecione um grafo</strong><span>Escolha um exemplo ou um grafo salvo na lista ao lado.</span></div></div></div>
+            <div id="executionView" role="tabpanel" aria-labelledby="executionTab" hidden><div class="graph-surface execution-surface"><svg id="executionSvg" viewBox="0 0 760 310" role="img" aria-label="Animação da execução do algoritmo"></svg></div><div id="executionDirection" class="execution-direction"></div><div class="execution-caption"><div><span id="executionStepLabel" class="result-kicker">PASSO 0</span><strong id="executionTitle">Execução</strong><p id="executionDescription"></p></div><span id="executionCounter" class="summary-pill">0 / 0</span></div><div class="execution-controls"><button id="restartAnimation" class="button button-secondary" type="button">↺ Reiniciar</button><button id="previousStep" class="button button-secondary" type="button">← Anterior</button><button id="playPauseAnimation" class="button button-primary" type="button">Pausar</button><button id="nextStep" class="button button-secondary" type="button">Próximo →</button></div></div>
+            <div class="adjacency-header"><div><h3>Lista de adjacência</h3><p>Estrutura do grafo selecionado</p></div><span class="required-tag">REQUISITO DA AC</span></div>
+            <div id="analysisAdjacencyList" class="adjacency-list"></div>
+          </section>
+        </div>
       <section id="resultsSection" class="card results-section" aria-label="Resultados dos algoritmos">
         <div class="section-heading"><div><span class="step">04</span><h2>Resultados</h2></div></div>
         <p class="section-help">Os dados da análise aparecem aqui; o mapa acima mostra a execução visual.</p>
         <div id="resultPanel" class="result-panel"><span class="result-mark">▦</span><div><strong>Nenhuma análise executada</strong><p>Escolha um algoritmo na barra lateral para ver o resultado.</p></div></div>
+      </section>
       </section>
     </main>
   </div>
@@ -78,6 +105,7 @@
 
   <div id="finishedScreen" class="finished-screen" hidden><div class="finished-card"><span class="finished-icon">✓</span><p class="eyebrow">SMARTNET ANALYZER</p><h1>Sessão finalizada</h1><p>Obrigado por explorar a rede. Quando quiser, comece com um novo grafo.</p><button id="restartButton" class="button button-primary">Iniciar nova sessão</button></div></div>
   <script src="graph.js"></script>
+  <script src="graph-io.js"></script>
   <script src="algorithms.js"></script>
   <script src="script.js"></script>
 </body>

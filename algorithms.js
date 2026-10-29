@@ -23,27 +23,37 @@
   }
 
   function dfs(graph, start) {
-    const list = adjacency(graph), visited = new Set(), finished = new Set(), order = [], tree = [];
+    const list = adjacency(graph), visited = new Set(), finished = new Set(), order = [], tree = [], edgeTypes = [];
     const parent = new Map([[start, null]]), depth = new Map([[start, 0]]), pre = new Map(), post = new Map(), steps = [];
     let clock = 0;
     function visit(vertex) {
       visited.add(vertex);
       order.push(vertex);
       pre.set(vertex, ++clock);
-      steps.push({ title: `Pré-visita de ${vertex}`, description: `${vertex} é acessado pela primeira vez (tempo ${clock}).`, phase: 'pre', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree] });
+      steps.push({ title: `Pré-visita de ${vertex}`, description: `${vertex} é acessado pela primeira vez (tempo ${clock}).`, phase: 'pre', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree], edgeTypes: [...edgeTypes] });
       for (const neighbor of list.get(vertex)) {
-        if (visited.has(neighbor.vertex)) continue;
-        parent.set(neighbor.vertex, vertex);
-        depth.set(neighbor.vertex, depth.get(vertex) + 1);
-        tree.push({ from: vertex, to: neighbor.vertex });
-        visit(neighbor.vertex);
+        const to = neighbor.vertex;
+        if (!visited.has(to)) {
+          parent.set(to, vertex);
+          depth.set(to, depth.get(vertex) + 1);
+          tree.push({ from: vertex, to });
+          edgeTypes.push({ from: vertex, to, type: 'tree' });
+          visit(to);
+          continue;
+        }
+        if (!graph.directed && parent.get(vertex) === to) continue;
+        if (!graph.directed && finished.has(to)) continue;
+        const type = !graph.directed || !finished.has(to) ? 'back' : pre.get(vertex) < pre.get(to) ? 'forward' : 'cross';
+        edgeTypes.push({ from: vertex, to, type });
+        const label = { back: 'retorno', forward: 'ida', cross: 'cruzamento' }[type];
+        steps.push({ title: `Aresta de ${label}: ${vertex} ${graph.directed?'→':'—'} ${to}`, description: `${vertex} ${graph.directed?'→':'—'} ${to} não pertence à árvore de busca.`, phase: 'edge', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree], edgeTypes: [...edgeTypes] });
       }
       post.set(vertex, ++clock);
       finished.add(vertex);
-      steps.push({ title: `Pós-visita de ${vertex}`, description: `Todos os vizinhos de ${vertex} foram examinados; a busca retorna ao vértice anterior (tempo ${clock}).`, phase: 'post', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree] });
+      steps.push({ title: `Pós-visita de ${vertex}`, description: `Todos os vizinhos de ${vertex} foram examinados; a busca retorna ao vértice anterior (tempo ${clock}).`, phase: 'post', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree], edgeTypes: [...edgeTypes] });
     }
     visit(start);
-    return { start, order, tree, rows: order.map(vertex=>({vertex,parent:parent.get(vertex),depth:depth.get(vertex),pre:pre.get(vertex),post:post.get(vertex)})), unreachable: graph.vertices.filter(vertex => !visited.has(vertex)).sort(compareNames), steps };
+    return { start, order, tree, edgeTypes, rows: order.map(vertex=>({vertex,parent:parent.get(vertex),depth:depth.get(vertex),pre:pre.get(vertex),post:post.get(vertex)})), unreachable: graph.vertices.filter(vertex => !visited.has(vertex)).sort(compareNames), steps };
   }
 
   function bfs(graph, start) {

@@ -66,6 +66,16 @@
       if (!this.directed) this.list.get(to).push({ to: from, weight: cost });
     }
 
+    updateEdgeWeight(from, to, weight) {
+      if (!this.weighted) throw Error('Este grafo não utiliza pesos.');
+      const cost = Number(weight);
+      if (weight == null || String(weight).trim() === '' || !Number.isFinite(cost) || cost < 0) throw Error('Use um peso numérico maior ou igual a zero.');
+      const edge = this.list.get(from)?.find(item => item.to === to);
+      if (!edge) throw Error('Aresta inexistente.');
+      edge.weight = cost;
+      if (!this.directed) this.list.get(to).find(item => item.to === from).weight = cost;
+    }
+
     removeEdge(from, to) {
       if (!this.list.has(from) || !this.list.has(to)) return false;
       const before = this.list.get(from).length;
