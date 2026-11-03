@@ -458,6 +458,7 @@ function dfsTreeDiagram(rows,edgeTypes,visibleTypes){
   if(!rows.length)return '<p class="result-note">Nenhum vértice alcançado.</p>';
   const children=new Map(rows.map(row=>[row.vertex,[]]));
   for(const row of rows)if(row.parent!==null)children.get(row.parent).push(row.vertex);
+  const roots=rows.filter(row=>row.parent===null);
   const leaves=rows.filter(row=>children.get(row.vertex).length===0).length;
   const width=Math.max(640,leaves*190+140),height=Math.max(190,(Math.max(...rows.map(row=>row.depth))+1)*112+24);
   const positions=new Map();let leafIndex=0;
@@ -468,7 +469,7 @@ function dfsTreeDiagram(rows,edgeTypes,visibleTypes){
     positions.set(vertex,{x,y:58+row.depth*112});
     return x;
   }
-  place(rows[0].vertex);
+  for(const root of roots)place(root.vertex);
   const edges=visibleTypes.has('tree')?rows.filter(row=>row.parent!==null).map(row=>{
     const parent=positions.get(row.parent),child=positions.get(row.vertex);
     return `<path d="M ${parent.x} ${parent.y+24} C ${parent.x} ${parent.y+60}, ${child.x} ${child.y-60}, ${child.x} ${child.y-27}" fill="none" stroke="#6eaaa2" stroke-width="2.5" marker-end="url(#dfs-tree-arrow)"/>`;
@@ -489,19 +490,19 @@ function dfsTreeDiagram(rows,edgeTypes,visibleTypes){
     const {x,y}=positions.get(row.vertex),name=row.vertex.length>5?`${row.vertex.slice(0,5)}…`:row.vertex;
     return `<g><title>${escapeHtml(row.vertex)} — pré ${row.pre}, pós ${row.post}${row.parent===null?' — origem':` — descoberto a partir de ${escapeHtml(row.parent)}`}</title><circle cx="${x}" cy="${y}" r="23" fill="#137e72" stroke="#fff" stroke-width="4"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${escapeHtml(name)}</text><text x="${x+34}" y="${y-5}" font-size="11" font-weight="700" fill="#176f66">pré ${row.pre}</text><text x="${x+34}" y="${y+11}" font-size="11" font-weight="700" fill="#8063b2">pós ${row.post}</text></g>`;
   }).join('');
+  const rootLabels=roots.length>1?roots.map((root,index)=>{const {x,y}=positions.get(root.vertex);return `<text x="${x}" y="${y-34}" text-anchor="middle" font-size="11" font-weight="800" fill="#4c6d78">Árvore ${index+1}</text>`;}).join(''):'';
   const markers=`<marker id="dfs-tree-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 Z" fill="#6eaaa2"/></marker>${Object.entries(edgeColors).map(([type,color])=>`<marker id="dfs-tree-${type}-arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0 L9 4.5 L0 9 Z" fill="${color}"/></marker>`).join('')}`;
-  return `<div class="dfs-tree-viewport"><svg class="dfs-tree-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Árvore de busca em profundidade com arestas classificadas"><defs>${markers}</defs>${otherEdges}${edges}${nodes}</svg></div>`;
+  return `<div class="dfs-tree-viewport"><svg class="dfs-tree-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="${roots.length>1?'Floresta':'Árvore'} de busca em profundidade com arestas classificadas"><defs>${markers}</defs>${otherEdges}${edges}${rootLabels}${nodes}</svg></div>`;
 }
 function renderAnalysis(name,result){
   let description='',content='';
   if(name==='DFS'){
-    description=`Origem: ${escapeHtml(result.start)} · ${result.order.length} vértices visitados`;
+    description=`Origem inicial: ${escapeHtml(result.start)} · ${result.order.length} vértices visitados · ${result.roots.length} ${result.roots.length===1?'árvore':'árvores'}`;
     content=`<div class="result-block"><h4>Ordem de visita</h4><p class="route-line">${result.order.map(escapeHtml).join(' → ')}</p></div>`;
-    content+=`<div class="result-block"><h4>Árvore de busca e classificação das arestas</h4><p>Linhas contínuas mostram a árvore. Setas pontilhadas mostram retorno, ida e cruzamento. Pré indica o primeiro acesso; pós indica o retorno após examinar os vizinhos.</p>`;
+    content+=`<div class="result-block"><h4>${result.roots.length===1?'Árvore de busca':'Floresta de busca'} e classificação das arestas</h4><p>Após concluir uma árvore, a busca recomeça no próximo vértice não visitado em ordem alfabética. Linhas contínuas mostram as árvores; setas pontilhadas mostram retorno, ida e cruzamento. Pré indica o primeiro acesso; pós indica o retorno após examinar os vizinhos.</p>`;
     const typeNames={tree:'Árvore',back:'Retorno',forward:'Ida',cross:'Cruzamento'};
     const legend=analysisGraph.directed?['tree','back','forward','cross']:['tree','back'];
     content+=`<div id="dfsEdgeFilters" class="dfs-edge-filters" role="group" aria-label="Filtrar tipos de aresta"><button class="dfs-filter active" type="button" data-edge-filter="all" aria-pressed="true">Todas</button>${legend.map(type=>`<button class="dfs-filter ${type}" type="button" data-edge-filter="${type}" aria-pressed="false"><span class="dfs-filter-line"></span>${typeNames[type]}</button>`).join('')}</div><div id="dfsTreeView"></div></div>`;
-    if(result.unreachable.length)content+=`<p class="result-warning">Não alcançados: ${result.unreachable.map(escapeHtml).join(', ')}</p>`;
   }else if(name==='BFS'){
     description=`Origem: ${escapeHtml(result.start)} · menor número de arestas`;
     content=`<div class="result-block"><h4>Ordem de visita</h4><p class="route-line">${result.order.map(escapeHtml).join(' → ')}</p></div>`;

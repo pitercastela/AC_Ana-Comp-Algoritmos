@@ -101,7 +101,7 @@ Norte,Sul
 
 | Algoritmo | Resultado                                                                                                               |
 | --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| DFS       | Ordem de visita e árvore visual com vértices circulares e tempos de pré e pós-visita ao lado de cada vértice. Arestas da árvore são contínuas; retorno, ida e cruzamento aparecem como setas pontilhadas e coloridas no mesmo diagrama. Os filtros mostram apenas os tipos desejados. Grafos não direcionados mostram árvore e retorno; grafos direcionados também mostram ida e cruzamento. Vértices não alcançados são indicados abaixo. |
+| DFS       | Percorre primeiro a origem escolhida; quando uma árvore termina, continua pelo próximo vértice não visitado em ordem alfabética até cobrir todo o grafo. O resultado pode ser uma floresta, com cada árvore identificada no diagrama. Os vértices circulares mostram pré e pós-visita; as arestas da árvore são contínuas, enquanto retorno, ida e cruzamento aparecem como setas pontilhadas e coloridas. Os filtros mostram apenas os tipos desejados. |
 | BFS       | Ordem de visita, nível de cada vértice e caminho com o menor número de arestas. A BFS não considera pesos.              |
 | Dijkstra  | Tabela iniciada na iteração 0, mostrando em cada linha o vértice selecionado e as melhores distâncias e rotas conhecidas; tabela final de distâncias e caminhos. Vértices inalcançáveis aparecem com distância infinita. |
 | Kruskal   | Arestas selecionadas, custo total e um mapa final apenas com as arestas mantidas. Se o grafo estiver desconectado, mostra uma floresta geradora e seus componentes, incluindo vértices isolados. |

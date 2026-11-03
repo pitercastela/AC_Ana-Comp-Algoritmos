@@ -24,7 +24,7 @@
 
   function dfs(graph, start) {
     const list = adjacency(graph), visited = new Set(), finished = new Set(), order = [], tree = [], edgeTypes = [];
-    const parent = new Map([[start, null]]), depth = new Map([[start, 0]]), pre = new Map(), post = new Map(), steps = [];
+    const parent = new Map(), depth = new Map(), pre = new Map(), post = new Map(), steps = [], roots = [];
     let clock = 0;
     function visit(vertex) {
       visited.add(vertex);
@@ -52,8 +52,15 @@
       finished.add(vertex);
       steps.push({ title: `Pós-visita de ${vertex}`, description: `Todos os vizinhos de ${vertex} foram examinados; a busca retorna ao vértice anterior (tempo ${clock}).`, phase: 'post', active: vertex, visited: [...visited], finished: [...finished], edges: [...tree], edgeTypes: [...edgeTypes] });
     }
-    visit(start);
-    return { start, order, tree, edgeTypes, rows: order.map(vertex=>({vertex,parent:parent.get(vertex),depth:depth.get(vertex),pre:pre.get(vertex),post:post.get(vertex)})), unreachable: graph.vertices.filter(vertex => !visited.has(vertex)).sort(compareNames), steps };
+    for (const root of [start,...graph.vertices.filter(vertex=>vertex!==start).sort(compareNames)]) {
+      if (visited.has(root)) continue;
+      parent.set(root,null);
+      depth.set(root,0);
+      roots.push(root);
+      if (roots.length>1) steps.push({ title:`Iniciar nova árvore em ${root}`, description:`A árvore anterior terminou. ${root} é o próximo vértice não visitado em ordem alfabética.`, phase:'root', active:root, visited:[...visited], finished:[...finished], edges:[...tree], edgeTypes:[...edgeTypes] });
+      visit(root);
+    }
+    return { start, roots, order, tree, edgeTypes, rows: order.map(vertex=>({vertex,parent:parent.get(vertex),depth:depth.get(vertex),pre:pre.get(vertex),post:post.get(vertex)})), unreachable: [], steps };
   }
 
   function bfs(graph, start) {
