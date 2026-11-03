@@ -90,7 +90,6 @@
         path: Number.isFinite(distance.get(vertex)) ? pathTo(parent, vertex) : []
       })) });
     }
-    snapshot(0, null);
     while (settled.size < graph.vertices.length) {
       let best = null;
       for (const vertex of graph.vertices) {

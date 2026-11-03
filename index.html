@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>SmartNet Analyzer — Protótipo</title>
+  <title>SmartNet Analyzer</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,45 +19,33 @@
         <button id="workspaceAnalysisTab" class="workspace-tab" type="button" role="tab" aria-controls="analysisWorkspace" aria-selected="false" tabindex="-1">Algoritmos</button>
       </nav>
       <section id="buildWorkspace" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceBuildTab">
-      <section class="intro">
-        <div><p class="eyebrow">MAPEAMENTO E ANÁLISE DE GRAFOS</p><h1>Construa sua cidade. Explore as conexões.</h1><p>Cadastre bairros e vias, confira a lista de adjacência e prepare suas análises em um só lugar.</p></div>
-        <div class="intro-actions builder-source"><label class="field-label" for="builderGraphSelect">Grafo de base para edição</label><div class="builder-source-controls"><select id="builderGraphSelect" aria-label="Grafo de base para edição"></select><button id="loadBuilderGraph" class="button button-secondary" type="button">Carregar</button><button id="importButton" class="button button-primary" type="button">Importar grafo</button><button id="exportButton" class="button button-secondary" type="button" disabled>Exportar TXT</button></div><p id="exportMessage" class="export-message" role="status"></p></div>
-      </section>
+        <section class="intro builder-intro"><div><p class="eyebrow">MONTAGEM DE GRAFOS</p><h1>Prepare seu grafo.</h1><p>Escolha o tipo e decida se quer partir de um modelo ou criar tudo do zero.</p></div></section>
+        <section id="builderSetup" class="card builder-setup" aria-labelledby="builderSetupTitle">
+          <div class="section-heading setup-heading"><div><span class="step">01</span><h2 id="builderSetupTitle">Configuração inicial</h2></div><button id="importButton" class="button button-secondary" type="button">Importar TXT</button></div>
+          <div class="setup-grid">
+            <div><label class="field-label" for="direction">Conexões</label><select id="direction" required><option value="" selected disabled hidden>Escolha o sentido</option><option value="undirected">Não direcionadas</option><option value="directed">Direcionadas</option></select></div>
+            <div><label class="field-label" for="weightMode">Pesos</label><select id="weightMode" required><option value="" selected disabled hidden>Escolha os pesos</option><option value="weighted">Com peso</option><option value="unweighted">Sem peso</option></select></div>
+          </div>
+          <fieldset class="setup-source"><legend>Como deseja começar?</legend><label class="source-choice"><input type="radio" name="builderSourceMode" value="new"><span><strong>Criar do zero</strong><small>Comece com um grafo vazio.</small></span></label><label class="source-choice"><input type="radio" name="builderSourceMode" value="template"><span><strong>Usar um modelo</strong><small>Edite um exemplo ou um grafo salvo.</small></span></label></fieldset>
+          <div id="builderTemplateField" class="setup-template" hidden><label class="field-label" for="builderGraphSelect">Modelo de base</label><select id="builderGraphSelect" aria-label="Modelo de base"></select><p id="templateHint" class="section-help"></p></div>
+          <p id="builderSetupError" class="error" role="alert"></p>
+          <div class="setup-actions"><button id="startBuilderButton" class="button button-primary" type="button" disabled>Começar montagem</button><button id="resumeBuilderButton" class="button button-secondary" type="button" hidden>Voltar ao grafo em edição</button></div>
+          <p id="setupDraftStatus" class="draft-status" role="status"></p>
+        </section>
 
-      <div class="layout">
-        <aside class="module-sidebar builder-sidebar" aria-label="Ferramentas de montagem">
-          <section class="card config-card">
-            <div class="section-heading"><div><span class="step">01</span><h2>Configuração</h2></div></div>
-            <div class="config-content"><p class="section-help">Defina o tipo antes de adicionar elementos.</p><div><label class="field-label" for="direction">Conexões</label><select id="direction"><option value="undirected">Não direcionadas</option><option value="directed">Direcionadas</option></select></div><div><label class="field-label" for="weightMode">Pesos</label><select id="weightMode"><option value="weighted">Com peso</option><option value="unweighted">Sem peso</option></select></div></div>
-          </section>
-
-          <section class="card editor-card">
-            <div class="section-heading"><div><span class="step">02</span><h2>Editar grafo</h2></div></div>
-            <div class="subsection"><h3>Novo vértice</h3><form id="vertexForm" class="inline-form"><input id="vertexName" aria-label="Nome do vértice" placeholder="Ex.: Centro" maxlength="24" required><button class="button button-primary" type="submit">Adicionar</button></form><p id="vertexError" class="error" role="alert"></p></div>
-            <div class="subsection"><h3>Nova aresta</h3><p class="section-help">Clique em dois vértices no mapa. Em grafos direcionados, selecione primeiro a origem e depois o destino.</p><div id="weightField"><label class="field-label" for="edgeWeight">Peso da próxima aresta</label><input id="edgeWeight" type="number" min="0" step="any" value="1" required></div><div class="edge-selection"><p id="edgeSelectionStatus" role="status" aria-live="polite">Adicione pelo menos dois vértices para criar uma conexão.</p><button id="cancelEdgeSelection" class="text-button" type="button" hidden>Cancelar seleção</button></div><p id="edgeError" class="error" role="alert"></p></div>
-            <div class="elements-heading"><h3>Elementos cadastrados</h3><button id="clearButton" class="text-button">Limpar grafo</button></div>
-            <div id="elementsList" class="elements-list"></div>
-          </section>
-          <section class="card save-card">
-            <div class="section-heading"><div><span class="step">03</span><h2>Salvar para análise</h2></div></div>
-            <p class="section-help">Dê um nome ao grafo para encontrá-lo na aba Algoritmos.</p>
-            <label class="field-label" for="graphName">Nome deste grafo</label>
-            <form id="saveGraphForm" class="inline-form"><input id="graphName" aria-label="Nome do grafo" placeholder="Ex.: Minha cidade" maxlength="40" required><button class="button button-primary" type="submit">Salvar</button></form>
-            <p class="save-warning">Salvar com o nome de um grafo já salvo substituirá a versão anterior.</p>
-            <p id="overwriteWarning" class="save-warning active" role="status" hidden>Já existe um grafo com este nome. Ao salvar, ele será substituído.</p>
-            <p id="saveGraphMessage" class="save-message" role="status"></p>
-            <p id="draftStatus" class="draft-status" role="status"></p>
-          </section>
-        </aside>
-
+        <div id="builderEditor" hidden>
+          <div class="builder-workspace-grid">
           <section class="card graph-card builder-map">
-            <div class="section-heading"><div><span class="step">◎</span><h2>Mapa da rede</h2></div><span id="graphSummary" class="summary-pill">0 vértices · 0 arestas</span></div>
-            <div id="builderGraphSurface" class="graph-surface"><svg id="graphSvg" viewBox="0 0 760 310" role="group" aria-label="Mapa interativo do grafo em montagem. Selecione dois vértices para criar uma aresta ou clique no peso para editá-lo."></svg><div id="graphEmpty" class="graph-empty"><div class="empty-icon">◇</div><strong>Sua cidade começa aqui</strong><span>Adicione um vértice ou carregue um teste para visualizar a rede.</span></div><form id="weightEditor" class="weight-editor" hidden><label id="weightEditorLabel" for="editedWeight">Editar peso</label><input id="editedWeight" type="number" min="0" step="any" required><div class="weight-editor-actions"><button class="button button-primary" type="submit">Salvar</button><button id="cancelWeightEdit" class="button button-secondary" type="button">Cancelar</button></div><p id="weightEditError" class="error" role="alert"></p></form></div>
-            <div class="adjacency-header"><div><h3>Lista de adjacência</h3><p>Representação em memória do grafo atual</p></div><span class="required-tag">REQUISITO DA AC</span></div>
-            <div id="adjacencyList" class="adjacency-list"></div>
+            <div class="section-heading builder-map-heading"><div><span class="step">◎</span><h2>Mapa da rede</h2></div><span id="graphSummary" class="summary-pill">0 vértices · 0 arestas</span></div>
+            <div class="builder-editor-actions"><span id="builderTypeSummary" class="builder-type-summary"></span><div><button id="exportButton" class="button button-secondary" type="button" disabled>Exportar TXT</button><button id="changeBuilderSetup" class="button button-secondary" type="button">Escolher outro grafo</button></div></div>
+            <div class="graph-surface builder-surface"><div class="builder-mode-bar"><div class="builder-tool-switch" role="group" aria-label="Modo de montagem"><button id="vertexToolButton" class="builder-tool-button active" type="button" aria-pressed="true">Vértices</button><button id="edgeToolButton" class="builder-tool-button" type="button" aria-pressed="false">Arestas</button></div><span id="builderModeHint" class="builder-map-hint">Clique no espaço vazio para criar ou em um vértice para renomear.</span><div id="edgeControls" class="builder-edge-controls" hidden><div id="weightField"><label class="field-label" for="edgeWeight">Peso da próxima aresta</label><input id="edgeWeight" type="number" min="0" step="any" value="1" required></div><div class="edge-selection"><p id="edgeSelectionStatus" role="status" aria-live="polite">Adicione pelo menos dois vértices para criar uma conexão.</p><button id="cancelEdgeSelection" class="text-button" type="button" hidden>Cancelar seleção</button></div><p id="edgeError" class="error" role="alert"></p></div></div><div id="builderGraphSurface" class="builder-canvas vertex-mode" tabindex="0" role="button" aria-label="Área de montagem. Pressione Enter para adicionar um vértice; selecione um vértice para renomeá-lo."><svg id="graphSvg" viewBox="0 0 760 310" role="group" aria-label="Mapa interativo do grafo em montagem."></svg><div id="graphEmpty" class="graph-empty"><div class="empty-icon">◇</div><strong>Sua cidade começa aqui</strong><span>Clique nesta área para adicionar o primeiro vértice.</span></div><form id="weightEditor" class="weight-editor" hidden><label id="weightEditorLabel" for="editedWeight">Editar peso</label><input id="editedWeight" type="number" min="0" step="any" required><div class="weight-editor-actions"><button class="button button-primary" type="submit">Salvar</button><button id="cancelWeightEdit" class="button button-secondary" type="button">Cancelar</button></div><p id="weightEditError" class="error" role="alert"></p></form></div></div>
+            <div class="builder-save"><div><h3>Salvar para análise</h3><p>O grafo ficará disponível na aba Algoritmos.</p></div><form id="saveGraphForm" class="inline-form"><input id="graphName" aria-label="Nome do grafo" placeholder="Nome do grafo" maxlength="40" required><button class="button button-primary" type="submit">Salvar grafo</button></form></div>
+            <p id="saveGraphMessage" class="save-message" role="status"></p><p id="draftStatus" class="draft-status" role="status"></p><p id="exportMessage" class="export-message" role="status"></p>
           </section>
-
-      </div>
+          <aside class="card builder-elements" aria-label="Elementos cadastrados"><div class="elements-heading"><h3>Elementos cadastrados</h3><button id="clearButton" class="text-button" type="button">Limpar grafo</button></div><div id="elementsList" class="element-sections"><section class="element-section" aria-labelledby="verticesListTitle"><h4 id="verticesListTitle">Vértices</h4><div id="verticesList" class="element-scroll" tabindex="0"></div></section><section class="element-section" aria-labelledby="edgesListTitle"><h4 id="edgesListTitle">Arestas</h4><div id="edgesList" class="element-scroll" tabindex="0"></div></section></div></aside>
+          </div>
+          <section class="card builder-adjacency"><div class="adjacency-header"><div><h3>Lista de adjacência</h3><p>Representação em memória do grafo atual</p></div><span class="required-tag">REQUISITO DA AC</span></div><div id="adjacencyList" class="adjacency-list"></div></section>
+        </div>
       </section>
       <section id="analysisWorkspace" class="workspace-panel" role="tabpanel" aria-labelledby="workspaceAnalysisTab" hidden>
         <section class="intro analysis-intro"><div><p class="eyebrow">ALGORITMOS EM GRAFOS</p><h1>Selecione um grafo e execute uma análise.</h1><p>Os grafos salvos na montagem e os exemplos de teste estão disponíveis abaixo.</p></div></section>
@@ -100,6 +88,8 @@
   </div>
 
   <dialog id="importDialog" class="modal"><form method="dialog" class="modal-shell"><div class="modal-heading"><div><p class="eyebrow">ENTRADA RÁPIDA</p><h2>Importar grafo</h2></div><button class="icon-button" value="cancel" aria-label="Fechar">×</button></div><p>Cole o conteúdo abaixo ou escolha um arquivo TXT. A importação substitui o grafo atual.</p><label class="field-label" for="importText">Dados do grafo</label><textarea id="importText" spellcheck="false" placeholder="# smartnet: undirected weighted&#10;vertices: O,A,B,C&#10;O,A,2&#10;O,B,5&#10;A,C,4"></textarea><input id="fileInput" type="file" accept=".txt,text/plain"><p id="importError" class="error" role="alert"></p><div class="modal-actions"><button class="button button-secondary" value="cancel">Cancelar</button><button id="applyImport" class="button button-primary" type="button">Usar este grafo</button></div></form></dialog>
+  <dialog id="vertexDialog" class="modal"><form id="vertexForm" class="modal-shell"><div class="modal-heading"><div><p class="eyebrow">MONTAGEM DO GRAFO</p><h2 id="vertexDialogTitle">Adicionar vértice</h2></div><button id="closeVertexDialog" class="icon-button" type="button" aria-label="Fechar">×</button></div><p id="vertexDialogHelp">Digite um nome único para o novo vértice.</p><label class="field-label" for="vertexName">Nome do vértice</label><input id="vertexName" placeholder="Ex.: Centro" maxlength="24" required><p id="vertexError" class="error" role="alert"></p><div class="modal-actions"><button id="cancelVertexDialog" class="button button-secondary" type="button">Cancelar</button><button id="vertexSubmitButton" class="button button-primary" type="submit">Incluir vértice</button></div></form></dialog>
+  <dialog id="overwriteDialog" class="modal"><div class="modal-shell"><div class="modal-heading"><div><p class="eyebrow">GRAFO JÁ SALVO</p><h2>Substituir o grafo?</h2></div><button id="closeOverwrite" class="icon-button" type="button" aria-label="Fechar">×</button></div><p id="overwriteDescription"></p><div class="modal-actions"><button id="cancelOverwrite" class="button button-secondary" type="button">Cancelar</button><button id="confirmOverwrite" class="button button-primary" type="button">Substituir grafo</button></div></div></dialog>
 
   <dialog id="finishDialog" class="modal"><div class="modal-shell"><div class="modal-heading"><div><p class="eyebrow">ENCERRAR SESSÃO</p><h2>Finalizar aplicação?</h2></div><button id="closeFinish" class="icon-button" aria-label="Fechar">×</button></div><p>O grafo atual será removido da tela. Você poderá iniciar uma nova sessão depois.</p><div class="modal-actions"><button id="cancelFinish" class="button button-secondary">Voltar</button><button id="confirmFinish" class="button button-primary">Finalizar aplicação</button></div></div></dialog>
 

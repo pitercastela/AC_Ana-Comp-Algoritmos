@@ -46,6 +46,17 @@
       this.list.set(vertex, []);
     }
 
+    renameVertex(oldName, newName) {
+      if (!this.list.has(oldName)) throw Error('Vértice inexistente.');
+      if (typeof newName !== 'string' || !newName.trim()) throw Error('Informe o nome do vértice.');
+      const vertex = newName.trim();
+      if (this.vertices.some(item => item !== oldName && item.toLocaleLowerCase('pt-BR') === vertex.toLocaleLowerCase('pt-BR'))) throw Error('Já existe um vértice com esse nome.');
+      if (vertex === oldName) return;
+      const next = new Map();
+      for (const [name, neighbors] of this.list) next.set(name === oldName ? vertex : name, neighbors.map(edge => ({ to: edge.to === oldName ? vertex : edge.to, weight: edge.weight })));
+      this.list = next;
+    }
+
     removeVertex(vertex) {
       if (!this.list.delete(vertex)) return false;
       for (const neighbors of this.list.values()) {

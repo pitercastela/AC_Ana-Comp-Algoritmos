@@ -21,7 +21,7 @@ Aplicação Web para cadastrar uma cidade como grafo, visualizar sua lista de ad
 
 ### Pelo site publicado
 
-https://pitercastela.github.io/AC_Ana-Comp-Algoritmos/
+[Abrir SmartNet Analyzer](https://pitercastela.github.io/AC_Ana-Comp-Algoritmos/). A aplicação funciona inteiramente no navegador; não exige conta nem instalação.
 
 ### Localmente
 
@@ -32,8 +32,8 @@ Não é necessário instalar dependências ou iniciar um servidor para usar a ap
 
 ## Como usar
 
-1. **Monte um grafo.** Na aba principal **Montar grafos**, escolha no topo um grafo vazio, um exemplo ou um grafo salvo como base para edição e clique em **Carregar**. Configure conexões direcionadas ou não direcionadas, com ou sem peso. Adicione os vértices na lateral. Para criar uma aresta, defina seu peso quando necessário e clique em dois vértices no mapa. Em grafos direcionados, clique primeiro na origem e depois no destino. Clique novamente no primeiro vértice ou em **Cancelar seleção** para desistir. Para mudar o peso de uma aresta existente, clique no número exibido sobre ela e salve o novo valor. O mapa e a lista de adjacência são atualizados imediatamente. Para mudar o tipo depois de iniciar o cadastro, use **Limpar grafo**.
-2. **Salve o grafo.** Dê um nome em **Salvar para análise** e clique em **Salvar**. Um nome já utilizado substitui o grafo salvo anteriormente, após confirmação. Para voltar a editar um grafo salvo, selecione-o no topo da página e clique em **Carregar**. Enquanto você edita, o navegador preserva automaticamente um rascunho que é recuperado ao recarregar a página; esse rascunho só fica disponível na aba Algoritmos depois de usar **Salvar**.
+1. **Prepare a montagem.** Na aba **Montar grafos**, escolha conexões direcionadas ou não direcionadas, com ou sem peso. Escolha **Criar do zero** ou **Usar um modelo**. A lista mostra apenas exemplos e grafos salvos compatíveis com o tipo escolhido. Clique em **Começar montagem** para abrir o editor. Para trocar de base depois, use **Escolher outro grafo**; **Voltar ao grafo em edição** preserva o trabalho atual.
+2. **Edite e salve.** Os botões **Vértices** e **Arestas** alternam os modos do mapa. Em **Vértices**, clique em uma área vazia para incluir um vértice ou em um vértice existente para renomeá-lo. A janela permite salvar ou cancelar. Em **Arestas**, defina o peso quando necessário e clique em dois vértices para conectá-los; em grafos direcionados, clique primeiro na origem. Clique novamente no primeiro vértice ou em **Cancelar seleção** para desistir. Nesse modo, clique no número de uma aresta para mudar seu peso. As listas de vértices e arestas aparecem à direita, cada uma com sua própria rolagem. Informe um nome no mesmo cartão e clique em **Salvar grafo**. Se o nome já existir, aparecerá uma confirmação antes de substituir a versão salva. O navegador preserva automaticamente um rascunho recuperável ao recarregar a página; ele só fica disponível na aba Algoritmos depois de salvar.
 3. **Escolha o grafo da execução.** Vá para a aba principal **Algoritmos** e selecione um grafo de teste ou um grafo salvo em **Grafo da análise**. A seleção carrega uma cópia independente do grafo que está aberto para edição na outra aba. Use **Carregar** para atualizar essa cópia após salvar novas alterações com o mesmo nome.
 4. **Execute uma análise.** Escolha o vértice de origem para DFS, BFS ou Dijkstra e clique no algoritmo desejado. Kruskal não precisa de origem e está disponível apenas para grafos não direcionados.
 5. **Leia o resultado.** A seção **Resultados**, abaixo do mapa e dos controles, mostra os dados em texto ou tabela. Use **Ver resultado** para chegar até ela. O mapa muda para a aba **Execução**, onde é possível pausar, avançar, voltar ou reiniciar a animação. A aba **Grafo** mostra o mapa sem destaques.
@@ -46,11 +46,11 @@ Os grafos salvos e o rascunho ficam no armazenamento local do navegador quando e
 
 ### Cadastro manual
 
-Use **Editar grafo**, na aba **Montar grafos**, para cadastrar vértices e arestas. Nomes de vértices devem ser únicos. A interface não aceita laços (uma aresta de um vértice para ele mesmo) nem arestas duplicadas. Em grafos com peso, informe um número maior ou igual a zero. Em grafos sem peso, cada aresta tem custo 1 internamente.
+Depois de **Começar montagem**, use **Vértices** para adicionar ou renomear pelo mapa e **Arestas** para conectar dois vértices. Renomear preserva as conexões. Nomes de vértices devem ser únicos. A interface não aceita laços (uma aresta de um vértice para ele mesmo) nem arestas duplicadas. Em grafos com peso, informe um número maior ou igual a zero. Em grafos sem peso, cada aresta tem custo 1 internamente.
 
 ### Grafos de teste
 
-Na aba **Algoritmos**, escolha um exemplo diretamente em **Selecionar grafo**. Para usá-lo como ponto de partida de uma edição, escolha o exemplo em **Grafo de base para edição** no topo da aba **Montar grafos** e clique em **Carregar**:
+Na aba **Algoritmos**, escolha um exemplo diretamente em **Selecionar grafo**. Para usá-lo como ponto de partida de uma edição, escolha **Usar um modelo** na preparação da aba **Montar grafos** e clique em **Começar montagem**:
 
 | Teste              | Finalidade                                                |
 | ------------------ | --------------------------------------------------------- |
@@ -62,11 +62,11 @@ Na aba **Algoritmos**, escolha um exemplo diretamente em **Selecionar grafo**. P
 | DFS direcionado · ida e cruzamento | Partindo de A, mostra uma ligação a descendente e outra entre ramos. |
 | Bairros isolados   | Conferir grafo sem peso e componentes desconectados.      |
 
-Carregar um teste substitui o grafo atual após confirmação.
+Na aba **Algoritmos**, escolher outro teste atualiza apenas a análise selecionada. Na montagem, iniciar uma nova base pede confirmação quando há alterações não salvas no grafo em edição.
 
 ### Importação de texto
 
-Clique em **Importar grafo** para colar texto ou selecionar um arquivo `.txt`. O formato é:
+Na preparação da montagem, clique em **Importar TXT** no canto superior direito para colar texto ou selecionar um arquivo `.txt`. Não é necessário escolher direção, pesos ou modelo antes: o site lê essas informações do próprio arquivo e abre o editor. O formato é:
 
 ```text
 # smartnet: undirected weighted
@@ -86,7 +86,7 @@ A,C,4
 
 ### Exportação em TXT
 
-Na aba **Montar grafos**, clique em **Exportar TXT** para baixar o grafo que está aberto para edição, incluindo alterações ainda não salvas. O botão fica disponível quando há pelo menos um vértice. O arquivo usa o formato acima e pode ser importado de volta pelo botão **Importar grafo**. O nome do arquivo deriva do campo **Nome deste grafo** ou, se estiver vazio, será `grafo-smartnet.txt`.
+Na aba **Montar grafos**, clique em **Exportar TXT** para baixar o grafo que está aberto para edição, incluindo alterações ainda não salvas. O botão fica disponível quando há pelo menos um vértice. O arquivo usa o formato acima e pode ser importado de volta pelo botão **Importar TXT**. O nome do arquivo deriva do campo **Nome do grafo** ou, se estiver vazio, será `grafo-smartnet.txt`.
 
 Exemplo direcionado sem peso:
 
@@ -101,10 +101,10 @@ Norte,Sul
 
 | Algoritmo | Resultado                                                                                                               |
 | --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| DFS       | Ordem de visita, árvore visual, tempos de pré e pós-visita, classificação visual e em tabela das arestas e vértices não alcançados. Os botões de filtro permitem mostrar apenas os tipos desejados no mapa e na tabela. Grafos não direcionados mostram arestas de árvore e de retorno; grafos direcionados também mostram arestas de ida e de cruzamento. |
+| DFS       | Ordem de visita e árvore visual com vértices circulares e tempos de pré e pós-visita ao lado de cada vértice. Arestas da árvore são contínuas; retorno, ida e cruzamento aparecem como setas pontilhadas e coloridas no mesmo diagrama. Os filtros mostram apenas os tipos desejados. Grafos não direcionados mostram árvore e retorno; grafos direcionados também mostram ida e cruzamento. Vértices não alcançados são indicados abaixo. |
 | BFS       | Ordem de visita, nível de cada vértice e caminho com o menor número de arestas. A BFS não considera pesos.              |
-| Dijkstra  | Tabela por iteração com a melhor distância e rota conhecidas para cada vértice; tabela final de distâncias e caminhos. Vértices inalcançáveis aparecem com distância infinita. |
-| Kruskal   | Arestas selecionadas e custo total. Se o grafo estiver desconectado, mostra uma floresta geradora e seus componentes.   |
+| Dijkstra  | Tabela iniciada na iteração 0, mostrando em cada linha o vértice selecionado e as melhores distâncias e rotas conhecidas; tabela final de distâncias e caminhos. Vértices inalcançáveis aparecem com distância infinita. |
+| Kruskal   | Arestas selecionadas, custo total e um mapa final apenas com as arestas mantidas. Se o grafo estiver desconectado, mostra uma floresta geradora e seus componentes, incluindo vértices isolados. |
 
 Quando houver empate, a aplicação usa **ordem alfabética** para escolher vizinhos, vértices ou arestas de mesmo custo. O Dijkstra aceita apenas pesos não negativos.
 
