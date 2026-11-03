@@ -46,13 +46,18 @@ const presets = {
     vertices: ['A','B','C','D'],
     edges: [['A','B'],['B','D'],['A','C'],['A','D'],['C','D']].map(([from,to])=>({from,to,weight:1}))
   },
+  directedForest: {
+    directed: true, weighted: false,
+    vertices: ['A','B','C','D','E'],
+    edges: [['A','B'],['C','D']].map(([from,to])=>({from,to,weight:1}))
+  },
   disconnected: {
     directed: false, weighted: false,
     vertices: ['A','B','C','D','E','F'],
     edges: [['A','B'],['B','C'],['D','E']].map(([from,to])=>({from,to,weight:1}))
   }
 };
-const presetNames = { proposal:'Grafo da proposta', ties:'Empates de rota', directed:'Cidade direcionada', directedClasses:'DFS direcionado · todos os tipos', directedCycle:'DFS direcionado · retorno', directedBranches:'DFS direcionado · ida e cruzamento', disconnected:'Bairros isolados' };
+const presetNames = { proposal:'Grafo da proposta', ties:'Empates de rota', directed:'Cidade direcionada', directedClasses:'DFS direcionado · todos os tipos', directedCycle:'DFS direcionado · retorno', directedBranches:'DFS direcionado · ida e cruzamento', directedForest:'DFS direcionado · novas árvores', disconnected:'Bairros isolados' };
 const storageKey = 'smartnet-saved-graphs-v1';
 function snapshotGraph(graph){return {directed:graph.directed,weighted:graph.weighted,vertices:graph.vertices,edges:graph.edges};}
 function loadSavedGraphs(){

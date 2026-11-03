@@ -60,6 +60,7 @@ Na aba **Algoritmos**, escolha um exemplo diretamente em **Selecionar grafo**. P
 | DFS direcionado · todos os tipos | Partindo de A, mostra árvore, retorno, ida e cruzamento. |
 | DFS direcionado · retorno | Partindo de A, mostra um ciclo e sua aresta de retorno. |
 | DFS direcionado · ida e cruzamento | Partindo de A, mostra uma ligação a descendente e outra entre ramos. |
+| DFS direcionado · novas árvores | Partindo de B, mostra a continuação em A, C e E quando uma árvore termina; E é isolado. |
 | Bairros isolados   | Conferir grafo sem peso e componentes desconectados.      |
 
 Na aba **Algoritmos**, escolher outro teste atualiza apenas a análise selecionada. Na montagem, iniciar uma nova base pede confirmação quando há alterações não salvas no grafo em edição.
@@ -101,7 +102,7 @@ Norte,Sul
 
 | Algoritmo | Resultado                                                                                                               |
 | --------- | ----------------------------------------------------------------------------------------------------------------------- |
-| DFS       | Percorre primeiro a origem escolhida; quando uma árvore termina, continua pelo próximo vértice não visitado em ordem alfabética até cobrir todo o grafo. O resultado pode ser uma floresta, com cada árvore identificada no diagrama. Os vértices circulares mostram pré e pós-visita; as arestas da árvore são contínuas, enquanto retorno, ida e cruzamento aparecem como setas pontilhadas e coloridas. Os filtros mostram apenas os tipos desejados. |
+| DFS       | Percorre primeiro a origem escolhida; quando uma árvore termina, continua pelo próximo vértice não visitado em ordem alfabética até cobrir todo o grafo, inclusive em grafos direcionados com vértices sem saída ou isolados. O resultado pode ser uma floresta, com cada árvore identificada no diagrama. Os vértices circulares mostram pré e pós-visita; as arestas da árvore são contínuas, enquanto retorno, ida e cruzamento aparecem como setas pontilhadas e coloridas. Os filtros mostram apenas os tipos desejados. |
 | BFS       | Ordem de visita, nível de cada vértice e caminho com o menor número de arestas. A BFS não considera pesos.              |
 | Dijkstra  | Tabela iniciada na iteração 0, mostrando em cada linha o vértice selecionado e as melhores distâncias e rotas conhecidas; tabela final de distâncias e caminhos. Vértices inalcançáveis aparecem com distância infinita. |
 | Kruskal   | Arestas selecionadas, custo total e um mapa final apenas com as arestas mantidas. Se o grafo estiver desconectado, mostra uma floresta geradora e seus componentes, incluindo vértices isolados. |
