@@ -86,7 +86,7 @@ A,C,4
 
 ### Exportação em TXT
 
-Na aba **Montar grafos**, clique em **Exportar TXT** para baixar o grafo que está aberto para edição, incluindo alterações ainda não salvas. O botão fica disponível quando há pelo menos um vértice. O arquivo usa o formato acima e pode ser importado de volta pelo botão **Importar TXT**. O nome do arquivo deriva do campo **Nome do grafo** ou, se estiver vazio, será `grafo-smartnet.txt`.
+Na aba **Montar grafos**, clique em **Exportar TXT** para visualizar o texto do grafo que está aberto para edição, incluindo alterações ainda não salvas. Na janela, use **Copiar texto** para enviá-lo à área de transferência ou **Baixar TXT** para salvar o arquivo. O botão de exportação fica disponível quando há pelo menos um vértice. O arquivo usa o formato acima e pode ser importado de volta pelo botão **Importar TXT**. O nome do arquivo deriva do campo **Nome do grafo** ou, se estiver vazio, será `grafo-smartnet.txt`.
 
 Exemplo direcionado sem peso:
 

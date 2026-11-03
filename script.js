@@ -553,17 +553,35 @@ $('#importButton').addEventListener('click',()=>{$('#importError').textContent='
 $('#fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(file)$('#importText').value=await file.text();});
 $('#applyImport').addEventListener('click',()=>{try{const graph=SmartNetGraphIO.parse($('#importText').value);if(editorStarted&&draftDirty&&state.vertices.length&&!confirm('Substituir o grafo em edição pelo arquivo importado?'))return;setGraph(graph);$('#graphName').value='';loadedSource='imported';editorStarted=true;editorTool='vertex';$('#direction').value=graph.directed?'directed':'undirected';$('#weightMode').value=graph.weighted?'weighted':'unweighted';document.querySelectorAll('input[name="builderSourceMode"]').forEach(radio=>radio.checked=false);renderBuilderSourceChoices();showBuilderEditor(true);markBuilderChanged();$('#importDialog').close();$('#fileInput').value='';$('#builderGraphSurface').focus();}catch(error){$('#importError').textContent=error.message;}});
 $('#exportButton').addEventListener('click',()=>{
-  const message=$('#exportMessage');message.textContent='';
+  $('#exportStatus').textContent='';
   try{
-    const txt=SmartNetGraphIO.serialize(state);
-    const rawName=$('#graphName').value.trim()||'grafo-smartnet';
-    const safeName=rawName.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'grafo-smartnet';
-    const url=URL.createObjectURL(new Blob(['\uFEFF',txt],{type:'text/plain;charset=utf-8'}));
-    const link=document.createElement('a');link.href=url;link.download=`${safeName}.txt`;
-    document.body.append(link);link.click();link.remove();
-    setTimeout(()=>URL.revokeObjectURL(url),30000);
-    message.textContent=`Arquivo ${safeName}.txt preparado para download.`;
-  }catch(error){message.textContent=error.message;}
+    $('#exportText').value=SmartNetGraphIO.serialize(state);
+    $('#exportDialog').showModal();
+  }catch(error){$('#exportMessage').textContent=error.message;}
+});
+$('#closeExportDialog').addEventListener('click',()=>$('#exportDialog').close());
+$('#cancelExportDialog').addEventListener('click',()=>$('#exportDialog').close());
+$('#copyExportButton').addEventListener('click',async()=>{
+  const value=$('#exportText').value;
+  try{
+    if(!navigator.clipboard?.writeText)throw Error('Clipboard API indisponível');
+    await navigator.clipboard.writeText(value);
+    $('#exportStatus').textContent='Texto copiado para a área de transferência.';
+  }catch{
+    const field=$('#exportText');field.focus();field.select();
+    let copied=false;
+    try{copied=document.execCommand('copy');}catch{}
+    $('#exportStatus').textContent=copied?'Texto copiado para a área de transferência.':'O navegador bloqueou a cópia automática. O texto está selecionado; pressione Ctrl+C.';
+  }
+});
+$('#downloadExportButton').addEventListener('click',()=>{
+  const rawName=$('#graphName').value.trim()||'grafo-smartnet';
+  const safeName=rawName.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9_-]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'grafo-smartnet';
+  const url=URL.createObjectURL(new Blob(['\uFEFF',$('#exportText').value],{type:'text/plain;charset=utf-8'}));
+  const link=document.createElement('a');link.href=url;link.download=`${safeName}.txt`;
+  document.body.append(link);link.click();link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  $('#exportStatus').textContent=`Download de ${safeName}.txt iniciado.`;
 });
 $('#finishButton').addEventListener('click',()=>$('#finishDialog').showModal());
 $('#closeFinish').addEventListener('click',()=>$('#finishDialog').close());
